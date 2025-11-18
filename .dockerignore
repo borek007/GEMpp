@@ -1,0 +1,42 @@
+# Version control
+.git
+.gitignore
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Build artifacts
+build/
+*.o
+*.so
+*.a
+*.dll
+
+# Documentation (except what's needed)
+doc/*.pdf
+doc/latex/
+
+# Packaging files
+packaging/
+
+# Resources not needed for CLI
+ressources/images/
+*.ico
+*.png
+*.bmp
+
+# Windows-specific files
+*.rc
+*.iss
+
+# Third party notices (available in container via doc)
+THIRD-PARTY-NOTICES
+
+# License files (available via doc)
+LICENSE.*
+
+# README files (available via doc)
+README*
