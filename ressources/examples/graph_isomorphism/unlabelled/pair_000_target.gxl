@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="pair_000_target" edgeids="true" edgemode="undirected" hypergraph="false">
+    <node id="n0">
+      <attr name="original_id">
+        <string>0</string>
+      </attr>
+    </node>
+    <node id="n1">
+      <attr name="original_id">
+        <string>1</string>
+      </attr>
+    </node>
+    <node id="n2">
+      <attr name="original_id">
+        <string>2</string>
+      </attr>
+    </node>
+    <edge id="e0" from="n0" to="n1" />
+    <edge id="e1" from="n0" to="n1" />
+  </graph>
+</gxl>
