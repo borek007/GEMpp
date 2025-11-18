@@ -4,8 +4,8 @@
     "vertices": 3,
     "positive_pairs": 1,
     "negative_pairs": 1,
-    "subgraph_positive_pairs": 6,
-    "subgraph_negative_pairs": 1
+    "subgraph_positive_pairs": 5,
+    "subgraph_negative_pairs": 2
   },
   "pairs": [
     {
@@ -115,21 +115,14 @@
     },
     {
       "id": "pair_005",
-      "type": "subgraph_isomorphic",
+      "type": "not_subgraph_isomorphic",
       "pattern": "pair_005_pattern.gxl",
       "target": "pair_005_target.gxl",
       "pattern_vertex_count": 4,
       "target_vertex_count": 5,
       "pattern_edge_count": 4,
       "target_edge_count": 5,
-      "description": "Square pattern can be mapped to 5-cycle target in 5 different rotational positions",
-      "permutations": [
-        [0, 1, 2, 3],
-        [1, 2, 3, 4],
-        [2, 3, 4, 0],
-        [3, 4, 0, 1],
-        [4, 0, 1, 2]
-      ]
+      "description": "Square pattern cannot be embedded in the 5-cycle target because the closing edge is missing"
     },
     {
       "id": "pair_006",
