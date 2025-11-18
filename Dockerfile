@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y \
     libqt5core5a \
     libqt5opengl5-dev \
     libglpk-dev \
+    glpk-utils \
+
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
