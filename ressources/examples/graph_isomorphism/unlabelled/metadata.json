@@ -1,0 +1,65 @@
+{
+  "description": "Automatically generated unlabeled multigraph pairs for graph isomorphism testing.",
+  "parameters": {
+    "vertices": 3,
+    "positive_pairs": 1,
+    "negative_pairs": 1
+  },
+  "pairs": [
+    {
+      "id": "pair_000",
+      "type": "isomorphic",
+      "pattern": "pair_000_pattern.gml",
+      "target": "pair_000_target.gml",
+      "vertex_count": 3,
+      "edge_count": 2,
+      "canonical_signature": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        2,
+        0
+      ],
+      "permutation": [
+        0,
+        2,
+        1
+      ]
+    },
+    {
+      "id": "pair_001",
+      "type": "non-isomorphic",
+      "pattern": "pair_001_pattern.gml",
+      "target": "pair_001_target.gml",
+      "vertex_count": 3,
+      "pattern_edge_count": 2,
+      "target_edge_count": 2,
+      "pattern_canonical_signature": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "target_canonical_signature": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        2,
+        0
+      ]
+    }
+  ]
+}
