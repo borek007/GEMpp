@@ -54,7 +54,8 @@ RUN rm -rf build && mkdir -p build
 # Build the project
 WORKDIR /app/build
 RUN qmake ../src/GEM++.pro
-RUN make -j$(nproc)
+RUN make -j$(nproc) sub-library && \
+    make -j$(nproc) sub-apps
 
 # Stage 2: Runtime environment
 FROM ubuntu:20.04 AS runtime
@@ -76,16 +77,11 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy built binaries and libraries from builder stage
-COPY --from=builder /app/build/linux64/release/bin/GEM++ /app/ 2>/dev/null || true
-COPY --from=builder /app/build/linux64/release/lib/libGEM++.so* /app/ 2>/dev/null || true
-COPY --from=builder /app/src/dependencies/QGar/libQgar.so* /app/ 2>/dev/null || true
-
-# If the files weren't built in linux64, try linux32
-COPY --from=builder /app/build/linux32/release/bin/GEM++ /app/ 2>/dev/null || true
-COPY --from=builder /app/build/linux32/release/lib/libGEM++.so* /app/ 2>/dev/null || true
+COPY --from=builder /app/build/linux64/release/bin/GEM++ /app/GEM++
+COPY --from=builder /app/build/linux64/release/lib/ /app/lib/
 
 # Set library path
-ENV LD_LIBRARY_PATH=/app:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/app/lib:$LD_LIBRARY_PATH
 
 # Create entrypoint script
 RUN echo '#!/bin/bash\nexec /app/GEM++ "$@"' > /app/entrypoint.sh && \
