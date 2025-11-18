@@ -31,7 +31,6 @@ COPY doc/ ./doc/
 RUN sed -i 's/SUBDIRS = Core GUI Molecule #CostsLearning/SUBDIRS = Core # GUI Molecule CostsLearning/' src/apps/apps.pro
 
 # Disable all external solver plugins for now
-RUN sed -i 's/SUBDIRS = Gurobi #GLPK #Cplex #LocalSolver/SUBDIRS = #Gurobi #GLPK #Cplex #LocalSolver/' src/plugins/plugins.pro
 
 # Fix architecture detection for ARM64
 RUN sed -i 's/contains(QMAKE_HOST.arch, x86_64) { ARCH=64 } else { ARCH=32 }/contains(QMAKE_HOST.arch, x86_64):ARCH=64\ncontains(QMAKE_HOST.arch, aarch64):ARCH=64\nelse:ARCH=32/' src/common.pri
@@ -55,6 +54,7 @@ RUN rm -rf build && mkdir -p build
 WORKDIR /app/build
 RUN qmake ../src/GEM++.pro
 RUN make -j$(nproc) sub-library && \
+    make -j$(nproc) sub-plugins && \
     make -j$(nproc) sub-apps
 
 # Stage 2: Runtime environment
