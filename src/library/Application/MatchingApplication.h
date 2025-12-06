@@ -2,8 +2,10 @@
 #define GEMPP_MATCHINGAPPLICATION_H
 
 #include <QQueue>
+#include <utility>
 #include "ConsoleApplication.h"
 #include "Model/GraphList.h"
+#include "Model/AdjacencyMatrixParser.h"
 #include "Solver/Matcher.h"
 
 /**

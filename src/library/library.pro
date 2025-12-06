@@ -41,6 +41,7 @@ HEADERS += \
     Extraction/TextKNNExtractor.h \
     Extraction/Vectorizer.h \
     Extraction/Zernike.h \
+    Model/AdjacencyMatrixParser.h \
     Model/Attribute.h \
     Model/Edge.h \
     Model/Graph.h \
@@ -112,6 +113,7 @@ SOURCES += \
     Extraction/TextKNNExtractor.cpp \
     Extraction/Vectorizer.cpp \
     Extraction/Zernike.cpp \
+    Model/AdjacencyMatrixParser.cpp \
     Model/Attribute.cpp \
     Model/Edge.cpp \
     Model/Graph.cpp \
