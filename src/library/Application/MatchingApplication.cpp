@@ -1,4 +1,5 @@
 #include "MatchingApplication.h"
+#include "Core/FileUtils.h"
 
 MatchingApplication::MatchingApplication(int &argc, char **argv, Problem::Type type, bool isMultiMatching) : ConsoleApplication(argc, argv), mutex_(QMutex::Recursive) {
     cfg_ = 0;
@@ -77,8 +78,29 @@ int MatchingApplication::match() {
 
         // Check number of arguments
         QStringList args = positionalArguments();
-        if(args.size() != 2)
-            Exception(QString("You must provide exactly two %1 (%2 given)").arg(isMultiMatching_?"directories":"graphs").arg(args.size()));
+        bool isAdjacencyMatrixFormat = false;
+
+        if(isMultiMatching_) {
+            if(args.size() != 2)
+                Exception(QString("You must provide exactly two directories (%1 given)").arg(args.size()));
+        } else {
+            // For single matching, we can accept 1 or 2 arguments
+            // 1 argument means adjacency matrix format with both graphs in one file
+            // 2 arguments means separate graph files
+            if(args.size() == 1) {
+                // Check if it's a .txt file (adjacency matrix format)
+                QString ext = FileUtils::getExtension(args.at(0));
+                if(ext.compare("txt", Qt::CaseInsensitive) == 0) {
+                    isAdjacencyMatrixFormat = true;
+                } else {
+                    Exception("Single file input must be a .txt file containing adjacency matrices");
+                }
+            } else if(args.size() == 2) {
+                isAdjacencyMatrixFormat = false;
+            } else {
+                Exception(QString("You must provide one .txt file or two graph files (%1 given)").arg(args.size()));
+            }
+        }
 
         // Loading weights and graphs
         w_ = new Weights(cfg_->substitution, cfg_->creation);
@@ -86,8 +108,15 @@ int MatchingApplication::match() {
             gl1_ = new GraphList(QDir(args.at(0)), cfg_->ext);
             gl2_ = (args.at(0).compare(args.at(1)) == 0)? gl1_ : new GraphList(QDir(args.at(1)), cfg_->ext);
         } else {
-            g1_ = new Graph(args.at(0));
-            g2_ = new Graph(args.at(1));
+            if(isAdjacencyMatrixFormat) {
+                // Parse adjacency matrix format
+                auto graphs = AdjacencyMatrixParser::parseFile(args.at(0));
+                g1_ = graphs.first;
+                g2_ = graphs.second;
+            } else {
+                g1_ = new Graph(args.at(0));
+                g2_ = new Graph(args.at(1));
+            }
         }
         initMatrix();
         QThreadPool::globalInstance()->setMaxThreadCount(cfg_->parallelInstances);
