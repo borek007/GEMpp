@@ -1,7 +1,8 @@
 #ifndef GEMPP_GRAPHELEMENT_H
 #define GEMPP_GRAPHELEMENT_H
 
-#include <QMap>
+#include <unordered_map>
+#include <string>
 #include "Attribute.h"
 #include "Core/IPrintable.h"
 #include "Core/Identified.h"
@@ -126,7 +127,7 @@ class DLL_EXPORT GraphElement : virtual public IPrintable, virtual public IXmlEl
          * @brief Returns all attributes of the element.
          * @return the attributes
          */
-        const QMap<QString, Attribute *> &getAttributes() const;
+        const std::unordered_map<std::string, Attribute *> &getAttributes() const;
 
         /**
          * @brief Returns the ::Graph represented by this ::GraphElement.
@@ -173,7 +174,7 @@ class DLL_EXPORT GraphElement : virtual public IPrintable, virtual public IXmlEl
         /**
          * @brief The attributes of the element.
          */
-        QMap<QString, Attribute *> attributes_;
+        std::unordered_map<std::string, Attribute *> attributes_;
 
         /**
          * @brief A subgraph represented by a ::Vertex of the parent ::Graph.

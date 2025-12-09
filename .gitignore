@@ -4,3 +4,4 @@ build/**
 .cursor/** 
 .gitignore
 *.xd*
+ressources/glpk/src/**

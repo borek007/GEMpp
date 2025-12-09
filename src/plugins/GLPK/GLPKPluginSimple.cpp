@@ -13,6 +13,7 @@
 */
 
 #include "GLPKPluginSimple.h"
+#include "Core/Exception.h"
 
 GLPK::GLPK() : Solver() {
     ia_ = 0;
@@ -37,6 +38,23 @@ GLPK::~GLPK() {
 void GLPK::init(Configuration *cfg) {
     cfg_ = cfg;
     lp_ = (LinearProgram *)0;
+    qp_ = (QuadProgram *)0;
+    nz_ = 0;
+
+    // Clean model
+    if(model_)
+        glp_delete_prob(model_);
+    model_ = (glp_prob *)0;
+
+    if(!varOrder_.empty())
+        varOrder_.clear();
+    if(!constOrder_.empty())
+        constOrder_.clear();
+}
+
+void GLPK::init(LinearProgram *lp, Configuration *cfg) {
+    lp_ = lp;
+    if (cfg) cfg_ = cfg;
     qp_ = (QuadProgram *)0;
     nz_ = 0;
 
@@ -110,8 +128,8 @@ void GLPK::initMatrix() {
         for(auto it = le->getTerms().begin(); it != le->getTerms().end(); ++it) {
             ++cpt;
             ia_[cpt] = constOrder_[c->getID()];
-            ja_[cpt] = varOrder_[it.key()->getID()];
-            ar_[cpt] = it.value();
+            ja_[cpt] = varOrder_[it->first->getID()];
+            ar_[cpt] = it->second;
         }
     }
     glp_load_matrix(model_, nz_, ia_, ja_, ar_);
@@ -122,10 +140,10 @@ double GLPK::solve(Solution *sol) {
         Exception("GLPK solver must be initialized before solving.");
     double obj = 0;
     switch(lp_->getSense()) {
-        case Program::MINIMIZE:
+        case LinearProgram::MINIMIZE:
             obj = INFINITY;
             break;
-        case Program::MAXIMIZE:
+        case LinearProgram::MAXIMIZE:
             obj = -INFINITY;
             break;
     }
@@ -188,13 +206,13 @@ void GLPK::addLinearConstraint(LinearConstraint *c) {
 
     double bound = c->getRHS()-c->getLinearExpression()->getConst();
     switch(c->getRelation()) {
-        case Constraint::LESS_EQ:
+        case LinearConstraint::LESS_EQ:
             glp_set_row_bnds(model_, constOrder_[c->getID()], GLP_UP, 0, bound);
             break;
-        case Constraint::GREATER_EQ:
+        case LinearConstraint::GREATER_EQ:
             glp_set_row_bnds(model_, constOrder_[c->getID()], GLP_LO, bound, 0);
             break;
-        case Constraint::EQUAL:
+        case LinearConstraint::EQUAL:
             glp_set_row_bnds(model_, constOrder_[c->getID()], GLP_FX, bound, bound);
             break;
     }
@@ -202,7 +220,7 @@ void GLPK::addLinearConstraint(LinearConstraint *c) {
 }
 
 void GLPK::addQuadConstraint(QuadConstraint *c) {
-    Q_UNUSED(c);
+    (void)c;  // Unused parameter
 }
 
 void GLPK::setObjective() {
@@ -210,14 +228,14 @@ void GLPK::setObjective() {
         case LinearProgram::MAXIMIZE:
             glp_set_obj_dir(model_, GLP_MAX);
             break;
-        case Program::MINIMIZE:
+        case LinearProgram::MINIMIZE:
             glp_set_obj_dir(model_, GLP_MIN);
             break;
     }
     LinearExpression *obj = lp_->getObjective();
 
     for(auto it = obj->getTerms().begin(); it != obj->getTerms().end(); ++it)
-        glp_set_obj_coef(model_, varOrder_[it.key()->getID()], it.value());
+        glp_set_obj_coef(model_, varOrder_[it->first->getID()], it->second);
     // Constant term
     glp_set_obj_coef(model_, 0, obj->getConst());
 }

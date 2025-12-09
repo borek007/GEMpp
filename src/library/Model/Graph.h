@@ -1,13 +1,13 @@
 #ifndef GEMPP_GRAPH_H
 #define GEMPP_GRAPH_H
 
-#include <QSet>
-#include <QList>
-#include <QFileInfo>
-#include "Metadata.h"
+#include <unordered_set>
+#include <vector>
+#include <string>
+// #include "Metadata.h"  // Temporarily disabled for Qt-free build
 #include "Vertex.h"
 #include "Edge.h"
-#include "Weights.h"
+// #include "Weights.h"  // Temporarily disabled for Qt-free build
 #include "Core/Identified.h"
 #include "Core/Random.h"
 
@@ -17,7 +17,7 @@
  * @see Edge
  * @see Vertex
  */
-class DLL_EXPORT Graph : virtual IXmlSerializable, virtual public IPrintable, virtual public GraphElement {
+class DLL_EXPORT Graph : virtual public IPrintable, virtual public GraphElement {
     public:
         /**
          * @brief Indicates the type of the ::Graph.
@@ -94,7 +94,7 @@ class DLL_EXPORT Graph : virtual IXmlSerializable, virtual public IPrintable, vi
          * @brief Returns all the ::Vertices of the ::Graph.
          * @return a list of ::Vertex
          */
-        const QList <Vertex *> &getVertices() const;
+        const std::vector <Vertex *> &getVertices() const;
 
         /**
          * @brief Returns all the terminal ::GraphElement of the ::Graph
@@ -103,7 +103,7 @@ class DLL_EXPORT Graph : virtual IXmlSerializable, virtual public IPrintable, vi
          * @param the type of terminal elements
          * @return a list of ::GraphElement
          */
-        QList<GraphElement *> getTerminals(GraphElement::Type type) const;
+        std::vector<GraphElement *> getTerminals(GraphElement::Type type) const;
 
         /**
          * @brief Returns a vertex of the graph.
@@ -148,7 +148,7 @@ class DLL_EXPORT Graph : virtual IXmlSerializable, virtual public IPrintable, vi
          * @brief Returns all the ::Edges of the ::Graph.
          * @return a list of ::Edge
          */
-        const QList <Edge *> &getEdges() const;
+        const std::vector <Edge *> &getEdges() const;
 
         /**
          * @brief Returns an ::Edge of the graph.
@@ -179,7 +179,7 @@ class DLL_EXPORT Graph : virtual IXmlSerializable, virtual public IPrintable, vi
          * @brief Returns the ::Metadata on the ::Graph.
          * @return the ::Metadata
          */
-        Metadata *getMetadata() const;
+        // Metadata *getMetadata() const;  // Temporarily disabled
 
         /**
          * @brief Returns the number of ::Vertices of the ::Graph.
@@ -234,7 +234,7 @@ class DLL_EXPORT Graph : virtual IXmlSerializable, virtual public IPrintable, vi
          * @param iSeeds the central vertices
          * @param nbhdSize the size of the neighborhood (maximal number of edges between two vertices of the subgraph)
          */
-        Graph *neighborhoodSubgraph(QSet<int> iSeeds, int nbhdSize) const;
+        Graph *neighborhoodSubgraph(std::unordered_set<int> iSeeds, int nbhdSize) const;
 
         /**
          * @brief Computes a random subgraph, by traversing the edges starting
@@ -250,7 +250,7 @@ class DLL_EXPORT Graph : virtual IXmlSerializable, virtual public IPrintable, vi
          * @param vertices the set of ::Vertex
          * @return the induced subgraph
          */
-        Graph *inducedSubgraph(const QSet<Vertex *> &vertices) const;
+        Graph *inducedSubgraph(const std::unordered_set<Vertex *> &vertices) const;
 
         /**
          * @brief Prints the ::Graph to a ::Printer using the GML format.
@@ -303,7 +303,7 @@ class DLL_EXPORT Graph : virtual IXmlSerializable, virtual public IPrintable, vi
          * This metadata file most likely contains an URL to the actual graph file.
          * @param filename the graph metadata file
          */
-        void fromXMLMetadata (const QString &filename);
+        // void fromXMLMetadata (const QString &filename);  // Temporarily disabled
 
         /**
          * @brief Exports a graph to a GML graph file.
@@ -322,16 +322,16 @@ class DLL_EXPORT Graph : virtual IXmlSerializable, virtual public IPrintable, vi
          * This metadata file most likely contains an URL to the actual graph file.
          * @param filename the graph metadata file
          */
-        void toXMLMetadata (const QString &filename);
+        // void toXMLMetadata (const QString &filename);  // Temporarily disabled
 
     private:
-        Graph *neighborhoodSubgraphRec(QSet<Vertex *> vertices, int nbhdSize) const;
+        Graph *neighborhoodSubgraphRec(std::unordered_set<Vertex *> vertices, int nbhdSize) const;
 
         Type type_;
-        Metadata *metadata_;
-        QList<Vertex *> vertices_;
-        QHash<QString, int> verticesInsertionOrder_;
-        QList<Edge *> edges_;
+        // Metadata *metadata_;  // Temporarily disabled
+        std::vector<Vertex *> vertices_;
+        std::unordered_map<std::string, int> verticesInsertionOrder_;
+        std::vector<Edge *> edges_;
 };
 
 #endif /* GEMPP_GRAPH_H */

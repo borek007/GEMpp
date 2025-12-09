@@ -1,10 +1,16 @@
 #ifndef GEMPP_SOLVER_H
 #define GEMPP_SOLVER_H
 
-#include "Configuration.h"
-#include "Formulation/Solution.h"
-#include "IntegerProgramming/LinearProgram.h"
-#include "IntegerProgramming/QuadProgram.h"
+#include "Core/Portability.h"
+
+// Minimal stub for Qt-free build
+class Configuration;
+class Solution;
+class LinearProgram;
+class QuadProgram;
+class Variable;
+class LinearConstraint;
+class QuadConstraint;
 
 class DLL_EXPORT Solver {
     public:
@@ -16,13 +22,11 @@ class DLL_EXPORT Solver {
         };
         static const char* solverName[COUNT];
         virtual ~Solver() {}
-        static Solvers fromName(QString name);
-        static QString toName(Solvers solver);
 
-        virtual void setLinearProgram(LinearProgram *lp);
-        virtual void setQuadProgram(QuadProgram *lp);
-        virtual void init(LinearProgram *lp, Configuration *cfg = 0);
-        virtual void init(QuadProgram *qp, Configuration *cfg = 0);
+        virtual void setLinearProgram(LinearProgram *lp) {}
+        virtual void setQuadProgram(QuadProgram *lp) {}
+        virtual void init(LinearProgram *lp, Configuration *cfg = 0) {}
+        virtual void init(QuadProgram *qp, Configuration *cfg = 0) {}
 
         virtual void init(Configuration *cfg = 0) = 0;
         virtual double solve(Solution *sol = 0) = 0;
@@ -40,7 +44,5 @@ class DLL_EXPORT Solver {
         virtual void setObjective() = 0;
         virtual void prepare() = 0;
 };
-
-Q_DECLARE_METATYPE(Solver::Solvers)
 
 #endif /* GEMPP_SOLVER_H */

@@ -1,44 +1,23 @@
 #ifndef GEMPP_CONFIGURATION_H
 #define GEMPP_CONFIGURATION_H
 
-#include "Core/ICleanable.h"
-#include "Model/Problem.h"
-#include "Formulation/GED.h"
-#include "Formulation/SubgraphMatching.h"
+// Minimal stub for Qt-free build
+#include <string>
 
-class DLL_EXPORT Configuration : virtual public IPrintable, virtual public ICleanable {
+class DLL_EXPORT Configuration {
     public:
-        Configuration();
-        virtual ~Configuration();
-
-        bool check();
-        virtual void clean();
-        virtual void print(Printer *p);
-
-        QString substitution;
-        QString creation;
-        QString outputDir;
-        QString program;
-        QString solution;
-        QString solver;
-        QString matrix;
-        QString ext;
+        Configuration() : verbose(false), timeLimit(0) {}
+        virtual ~Configuration() {}
 
         bool verbose;
-        int number;
-        Formulation::CutMethod cutMethod;
-
-        Problem::Type matchingType;
-        SubgraphMatching::Method subMethod;
-        bool induced;
-        GraphEditDistance::Method gedMethod;
-
-        double upperbound;
-
-        int threadsPerInstance;
-        int parallelInstances;
-
         double timeLimit;
+        std::string outputDir;
+
+        // GLPK-specific configuration
+        int msg_lev;
+        double tm_lim;
+        double mip_gap;
+        int presolve;
 };
 
 #endif /* GEMPP_CONFIGURATION_H */

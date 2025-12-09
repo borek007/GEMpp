@@ -1,7 +1,7 @@
 #ifndef GEMPP_VERTEX_H
 #define GEMPP_VERTEX_H
 
-#include <QSet>
+#include <unordered_set>
 #include "GraphElement.h"
 #include "Edge.h"
 
@@ -71,7 +71,7 @@ class DLL_EXPORT Vertex : virtual public GraphElement {
          * particular direction.
          * @param d the direction of the ::Edges
          */
-        QSet<Edge *> getEdges(Direction d) const;
+        std::unordered_set<Edge *> getEdges(Direction d) const;
 
         /**
          * @brief Returns the number of all the incident ::Edges
@@ -94,18 +94,18 @@ class DLL_EXPORT Vertex : virtual public GraphElement {
          * considering only ::Edges having a particular direction.
          * @param d the direction of the ::Edges
          */
-        QSet<Vertex *> getNeighbours(Direction d) const;
+        std::unordered_set<Vertex *> getNeighbours(Direction d) const;
 
     private:
         /**
          * @brief The set of ::Edges incident from this ::Vertex
          */
-        QSet<Edge *> outEdges_;
+        std::unordered_set<Edge *> outEdges_;
 
         /**
          * @brief The set of ::Edges incident to this ::Vertex
          */
-        QSet<Edge *> inEdges_;
+        std::unordered_set<Edge *> inEdges_;
 };
 
 #endif /* GEMPP_VERTEX_H */

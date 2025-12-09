@@ -1,59 +1,32 @@
 #ifndef GEMPP_LINEARCONSTRAINT_H
 #define GEMPP_LINEARCONSTRAINT_H
 
-#include "Constraint.h"
-#include "LinearExpression.h"
+// Minimal stub for Qt-free build
+#include <string>
 
-/**
- * @brief The LinearConstraint class represents the mathematical concept of linear constraints, used in LinearProgram.
- *
- * In comparison to a Constraint, a LinearConstraint must have a LinearExpression as its expression.
- *
- * @see Constraint
- * @see LinearExpression
- * @see LinearProgram
- * @author J.Lerouge <julien.lerouge@litislab.fr>
- */
-class DLL_EXPORT LinearConstraint : virtual public Constraint {
+class LinearExpression;
+
+class DLL_EXPORT LinearConstraint {
     public:
+        enum Relation {
+            LESS_EQ = 0,
+            GREATER_EQ,
+            EQUAL
+        };
 
-        /**
-         * @brief Constructs a new LinearConstraint, with parameters.
-         * @param exp the LinearExpression
-         * @param relation the Constraint::Relation
-         * @param rhs the right hand side value
-         */
-        LinearConstraint(LinearExpression *exp, Relation relation, double rhs);
+        LinearConstraint() : relation_(LESS_EQ), rhs_(0) {}
+        virtual ~LinearConstraint() {}
 
-        /**
-         * @brief Destructs a LinearConstraint.
-         */
-        ~LinearConstraint();
+        Relation getRelation() const { return relation_; }
+        double getRHS() const { return rhs_; }
+        LinearExpression *getLinearExpression() { return nullptr; }  // Stub
 
-        /**
-         * @brief Returns the LinearExpression of the LinearConstraint.
-         * @return the value of Constraint::exp_, casted as LinearExpression
-         */
-        LinearExpression *getLinearExpression();
+        const std::string &getID() const { return id_; }
 
-        /**
-         * @brief Indicates whether the LinearConstraint is satisfied or not,
-         * depending on the value of the LinearExpression.
-         * @return true if the linear constraint is satisfied, false otherwise
-         */
-        bool eval();
-
-        /**
-         * @brief Prints the LinearConstraint to a Printer.
-         * @param p The Printer
-         */
-        void print(Printer *p);
-
-        /**
-         * @brief Serializes the LinearConstraint into a text string.
-         * @return the text string
-         */
-        QString toString();
+    private:
+        std::string id_;
+        Relation relation_;
+        double rhs_;
 };
 
-#endif /*LINEARCONSTRAINT_H*/
+#endif /* GEMPP_LINEARCONSTRAINT_H */

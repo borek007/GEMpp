@@ -17,8 +17,15 @@
 
 #include <unordered_map>
 #include <string>
+#include <cmath>
 #include "glpk.h"
 #include "Solver/Solver.h"
+#include "Solver/Configuration.h"
+#include "Formulation/Solution.h"
+#include "IntegerProgramming/LinearProgram.h"
+#include "IntegerProgramming/LinearExpression.h"
+#include "IntegerProgramming/LinearConstraint.h"
+#include "Core/Math.h"
 
 class GLPK : public Solver{
     public:
@@ -26,6 +33,7 @@ class GLPK : public Solver{
         ~GLPK();
 
         void init(Configuration *cfg);
+        void init(LinearProgram *lp, Configuration *cfg = 0);
         double solve(Solution *sol = 0);
         void update(bool newBounds = false);
 
