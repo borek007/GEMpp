@@ -1,8 +1,8 @@
 #include "Variable.h"
 
-Variable::Variable(QString id, Type type, int lowerBound, int upperBound) : Identified(id), type_(type) {
+Variable::Variable(const std::string &id, Type type, int lowerBound, int upperBound) : Identified(id), type_(type) {
     activate(lowerBound, upperBound);
-    columns_ = QHash<QString, double>();
+    columns_ = std::unordered_map<std::string, double>();
     value_ = lowerBound_;
 }
 
@@ -17,8 +17,12 @@ void Variable::setType(Type type) {
 }
 
 void Variable::setValue(int val) {
-    if(val < lowerBound_ || val > upperBound_)
-        Exception(QString("Illegal value assignment for variable %1 : %2 is out of bounds [%3;%4]").arg(id_).arg(val).arg(lowerBound_).arg(upperBound_));
+    if(val < lowerBound_ || val > upperBound_) {
+        char buffer[256];
+        std::snprintf(buffer, sizeof(buffer), "Illegal value assignment for variable %s : %d is out of bounds [%d;%d]",
+                     id_.c_str(), val, lowerBound_, upperBound_);
+        Exception(std::string(buffer));
+    }
     value_ = val;
 }
 
@@ -35,10 +39,18 @@ int Variable::getLowerBound() {
 }
 
 void Variable::setLowerBound(int lowerBound) {
-    if(lowerBound > upperBound_)
-        Exception(QString("Illegal lower bound assignment for variable %1 : LB=%2 > UB=%3").arg(id_).arg(lowerBound).arg(upperBound_));
-    if(type_ == BINARY && lowerBound != 0)
-        Exception(QString("Illegal lower bound assignment for variable %1 : LB=%2 must be 0").arg(id_).arg(lowerBound));
+    if(lowerBound > upperBound_) {
+        char buffer[256];
+        std::snprintf(buffer, sizeof(buffer), "Illegal lower bound assignment for variable %s : LB=%d > UB=%d",
+                     id_.c_str(), lowerBound, upperBound_);
+        Exception(std::string(buffer));
+    }
+    if(type_ == BINARY && lowerBound != 0) {
+        char buffer[256];
+        std::snprintf(buffer, sizeof(buffer), "Illegal lower bound assignment for variable %s : LB=%d must be 0",
+                     id_.c_str(), lowerBound);
+        Exception(std::string(buffer));
+    }
     lowerBound_ = lowerBound;
 }
 
@@ -47,10 +59,18 @@ int Variable::getUpperBound() {
 }
 
 void Variable::setUpperBound(int upperBound) {
-    if(upperBound < lowerBound_)
-        Exception(QString("Illegal upper bound assignment for variable %1 : UB=%2 < LB=%3").arg(id_).arg(upperBound).arg(lowerBound_));
-    if(type_ == BINARY && upperBound != 1 && upperBound != 0)
-        Exception(QString("Illegal upper bound assignment for variable %1 : UB=%2 must be 0 or 1").arg(id_).arg(upperBound));
+    if(upperBound < lowerBound_) {
+        char buffer[256];
+        std::snprintf(buffer, sizeof(buffer), "Illegal upper bound assignment for variable %s : UB=%d < LB=%d",
+                     id_.c_str(), upperBound, lowerBound_);
+        Exception(std::string(buffer));
+    }
+    if(type_ == BINARY && upperBound != 1 && upperBound != 0) {
+        char buffer[256];
+        std::snprintf(buffer, sizeof(buffer), "Illegal upper bound assignment for variable %s : UB=%d must be 0 or 1",
+                     id_.c_str(), upperBound);
+        Exception(std::string(buffer));
+    }
     upperBound_ = upperBound;
 }
 
@@ -69,8 +89,12 @@ void Variable::activate(int lowerBound, int upperBound) {
             upperBound_ = 1;
             break;
     }
-    if(lowerBound_ > upperBound_)
-        Exception(QString("Illegal bounds for variable %1 : LB=%2 > UB=%3").arg(id_).arg(lowerBound_).arg(upperBound_));
+    if(lowerBound_ > upperBound_) {
+        char buffer[256];
+        std::snprintf(buffer, sizeof(buffer), "Illegal bounds for variable %s : LB=%d > UB=%d",
+                     id_.c_str(), lowerBound_, upperBound_);
+        Exception(std::string(buffer));
+    }
 }
 
 void Variable::deactivate() {
@@ -78,15 +102,15 @@ void Variable::deactivate() {
     upperBound_ = 0;
 }
 
-void Variable::addColumn(QString id, double d) {
-    columns_.insert(id, d);
+void Variable::addColumn(const std::string &id, double d) {
+    columns_[id] = d;
 }
 
-QHash<QString, double> &Variable::getColumns() {
+std::unordered_map<std::string, double> &Variable::getColumns() {
     return columns_;
 }
 
-double Variable::getColumn(QString id) {
+double Variable::getColumn(const std::string &id) {
     return columns_[id];
 }
 
@@ -95,7 +119,7 @@ void Variable::print(Printer *p) {
 }
 
 Variable::operator Term() const {
-    return qMakePair((Variable *)this, 1.0);
+    return std::make_pair((Variable *)this, 1.0);
 }
 
 bool operator==(Quad q1, Quad q2) {

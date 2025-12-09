@@ -1,5 +1,5 @@
 #include "Exception.h"
 
-void Exception(const QString &errorString) {
-    throw std::logic_error(errorString.toStdString());
+void Exception(const std::string &errorString) {
+    throw std::logic_error(errorString);
 }

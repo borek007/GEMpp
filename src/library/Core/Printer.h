@@ -1,16 +1,8 @@
 #ifndef GEMPP_PRINTER_H
 #define GEMPP_PRINTER_H
 
-/** @brief The standard output stream */
-#define qcin QTextStream(stdin)
-
-/** @brief The standard output stream */
-#define qcout QTextStream(stdout)
-
-/** @brief The standard error stream */
-#define qcerr QTextStream(stderr)
-
-#include <QTextStream>
+#include <string>
+#include <iostream>
 #include "Constants.h"
 
 /**
@@ -42,13 +34,13 @@ class DLL_EXPORT Printer {
          * @brief Retrieves the content stored in the Printer.
          * @return the value of Printer::content_
          */
-        QString getContent();
+        const std::string &getContent() const;
 
         /**
          * @brief Sets the content of the Printer.
          * @param content the content to set
          */
-        void setContent(const QString &content);
+        void setContent(const std::string &content);
 
         /**
          * @brief Gets the indentation width (in number of spaces) of the Printer.
@@ -68,9 +60,9 @@ class DLL_EXPORT Printer {
         void show();
 
         /**
-         * @brief Stores a QString text in a Printer, appends a new line at the end.
+         * @brief Stores a std::string text in a Printer, appends a new line at the end.
          */
-        void dump(QString s);
+        void dump(const std::string &s);
 
         /**
          * @brief Adds one indentation level.
@@ -96,19 +88,19 @@ class DLL_EXPORT Printer {
          * @brief Capitalizes a string, by making each word's first
          * character upper case and the other characters lower case.
          */
-        static QString capitalize(QString s);
+        static std::string capitalize(const std::string &s);
 
         /**
          * @brief Capitalizes a word, by making its first
          * character upper case and the other characters lower case.
          */
-        static QString capitalizeWord(QString w);
+        static std::string capitalizeWord(const std::string &w);
 
     private:
         /**
          * @brief The content of the Printer.
          */
-        QString content_;
+        std::string content_;
 
         /**
          * @brief The number of spaces used per indentation level.

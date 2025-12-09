@@ -1,6 +1,7 @@
 #ifndef GEMPP_IDENTIFIED_H
 #define GEMPP_IDENTIFIED_H
 
+#include <string>
 #include "Constants.h"
 
 /**
@@ -25,7 +26,7 @@ class DLL_EXPORT Identified
          * @brief Constructs a new Identified object with an identifier.
          * @param id the identifier
          */
-        Identified(QString id);
+        Identified(const std::string &id);
 
         /**
          * @brief Destructs an Identified object.
@@ -36,19 +37,19 @@ class DLL_EXPORT Identified
          * @brief Returns the identifier of the Identified.
          * @return the value of Identified::id_
          */
-        const QString &getID() const;
+        const std::string &getID() const;
 
         /**
          * @brief Sets the identifier of the Identified.
          * @param id the new identifier of the Identified
          */
-        void setID(QString id);
+        void setID(const std::string &id);
 
     protected:
         /**
          * @brief The identifier of the Identified.
          */
-        QString id_;
+        std::string id_;
 };
 
 #endif /* GEMPP_IDENTIFIED_H */

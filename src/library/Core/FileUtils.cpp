@@ -1,131 +1,128 @@
 #include "FileUtils.h"
+#include <sstream>
+#include <algorithm>
 
 FileUtils::FileUtils() {}
 
 FileUtils::~FileUtils() {}
 
-QString FileUtils::load(const QString &filename) {
-    exists(filename);
-    QFile f(filename);
-    open(f, QFile::ReadOnly);
-    QString res = f.readAll();
-    close(f);
-    return res;
+std::string FileUtils::load(const std::string &filename) {
+    checkExists(filename);
+    std::ifstream file(filename, std::ios::in | std::ios::binary);
+    if (!file.is_open()) {
+        Exception("Cannot open file: " + filename);
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    file.close();
+    return buffer.str();
 }
 
-void FileUtils::save(IPrintable *ip, const QString &filename, bool append) {
+void FileUtils::save(IPrintable *ip, const std::string &filename, bool append) {
     Printer p;
     ip->print(&p);
     save(p.getContent(), filename, append);
 }
 
-void FileUtils::save(const QString &s, const QString &filename, bool append) {
-    QFile f(filename);
-    open(f, QFile::ReadWrite | (append? QFile::Append : QFile::Truncate));
-    QTextStream stream (&f);
-    stream << s;
-    close(f);
-}
-
-bool FileUtils::remove(const QString &filename) {
-    QFile f(filename);
-    return f.remove();
-}
-
-void FileUtils::open(QFile &file, QFile::OpenMode mode) {
-    if(!file.open(mode | QFile::Text))
-        Exception(QString("The file \"%1\" cannot be opened : %2").arg(file.fileName(), file.errorString()));
-}
-
-void FileUtils::close(QFile &file) {
+void FileUtils::save(const std::string &s, const std::string &filename, bool append) {
+    std::ofstream file(filename, std::ios::out | std::ios::binary | (append ? std::ios::app : std::ios::trunc));
+    if (!file.is_open()) {
+        Exception("Cannot open file for writing: " + filename);
+    }
+    file << s;
     file.close();
 }
 
-QString FileUtils::getExtension(const QString &filename) {
-    return QFileInfo(filename).suffix();
+bool FileUtils::remove(const std::string &filename) {
+    return std::remove(filename.c_str()) == 0;
 }
 
-void FileUtils::checkExtension(const QString &filename, const QString &extension) {
-    if(QFileInfo(filename).suffix().compare(extension, Qt::CaseInsensitive) != 0)
-        Exception(QString("The file \"%1\" is not a *.%2 file.").arg(filename,extension));
+std::string FileUtils::getExtension(const std::string &filename) {
+    size_t dotPos = filename.find_last_of('.');
+    if (dotPos != std::string::npos) {
+        return filename.substr(dotPos + 1);
+    }
+    return "";
 }
 
-QString FileUtils::changeExtension(const QString &filename, const QString &extension) {
+void FileUtils::checkExtension(const std::string &filename, const std::string &extension) {
+    std::string ext = getExtension(filename);
+    std::string extLower = ext;
+    std::string expectedLower = extension;
+    std::transform(extLower.begin(), extLower.end(), extLower.begin(), ::tolower);
+    std::transform(expectedLower.begin(), expectedLower.end(), expectedLower.begin(), ::tolower);
+
+    if (extLower != expectedLower) {
+        Exception("The file \"" + filename + "\" is not a *." + extension + " file.");
+    }
+}
+
+std::string FileUtils::changeExtension(const std::string &filename, const std::string &extension) {
     return removeExtension(filename) + "." + extension;
 }
 
-QString FileUtils::removeExtension(const QString &filename) {
-    QFileInfo fi(filename);
-    return slashed(fi.path(), fi.baseName());
+std::string FileUtils::removeExtension(const std::string &filename) {
+    size_t dotPos = filename.find_last_of('.');
+    if (dotPos != std::string::npos) {
+        return filename.substr(0, dotPos);
+    }
+    return filename;
 }
 
-bool FileUtils::exists(const QString &filename) {
-    return QFileInfo(filename).exists();
+bool FileUtils::exists(const std::string &filename) {
+    struct stat buffer;
+    return (stat(filename.c_str(), &buffer) == 0);
 }
 
-bool FileUtils::exists(const QDir &path) {
-    return path.exists();
+void FileUtils::checkExists(const std::string &filename) {
+    if (!exists(filename)) {
+        Exception("The file \"" + filename + "\" does not exist.");
+    }
 }
 
-void FileUtils::checkExists(const QString &filename) {
-    if(!exists(filename))
-        Exception(QString("The file \"%1\" does not exist.").arg(filename));
+bool FileUtils::isValid(const std::string &filename) {
+    return !filename.empty();
 }
 
-void FileUtils::checkExists(const QDir &path) {
-    if(!exists(path))
-        Exception(QString("The directory \"%1\" does not exist.").arg(path.path()));
-}
-
-bool FileUtils::isValid(const QString &filename) {
-    return !(filename.isEmpty());
-}
-
-void FileUtils::checkValid(const QString &filename) {
-    if(!isValid(filename))
+void FileUtils::checkValid(const std::string &filename) {
+    if (!isValid(filename)) {
         Exception("The given filename is empty.");
+    }
 }
 
-QDir FileUtils::slashed(const QDir &parent, const QDir &path) {
-    return QDir(slashed(parent.path(), path.path()));
-}
-
-QString FileUtils::slashed(const QDir &parent, const QString &path) {
-    return slashed(parent.path(), path);
-}
-
-QString FileUtils::slashed(const QString &parent, const QString &path) {
-    if(isAbsolute(path) || parent.compare(".") == 0)
+std::string FileUtils::slashed(const std::string &parent, const std::string &path) {
+    if (isAbsolute(path) || parent == ".") {
         return path;
+    }
+    if (parent.empty()) {
+        return path;
+    }
+    if (parent.back() == '/' || parent.back() == '\\') {
+        return parent + path;
+    }
     return parent + "/" + path;
 }
 
-QString FileUtils::path(const QString &filepath) {
-    return QFileInfo(filepath).path();
+std::string FileUtils::path(const std::string &filepath) {
+    size_t slashPos = filepath.find_last_of("/\\");
+    if (slashPos != std::string::npos) {
+        return filepath.substr(0, slashPos);
+    }
+    return ".";
 }
 
-QDir FileUtils::dir(const QString &filepath) {
-    return QFileInfo(filepath).dir();
+std::string FileUtils::filename(const std::string &filepath) {
+    size_t slashPos = filepath.find_last_of("/\\");
+    if (slashPos != std::string::npos) {
+        return filepath.substr(slashPos + 1);
+    }
+    return filepath;
 }
 
-QString FileUtils::filename(const QString &filepath) {
-    return QFileInfo(filepath).fileName();
-}
-
-bool FileUtils::isAbsolute(const QString &path) {
-    return QFileInfo(path).isAbsolute();
-}
-
-bool FileUtils::containsImages(const QDir &dir) {
-    return !(dir.entryList(QString(IMG_FORMATS).split(" "), QDir::Files).isEmpty());
-}
-
-bool FileUtils::createPath(const QString &parent, const QString &path) {
-    return QDir(parent).mkpath(path);
-}
-
-QString FileUtils::checkCreatedPathExists(const QString &parent, const QString &path) {
-    if(!createPath(parent, path))
-        Exception(QString("Could not create path \"%1\"").arg(slashed(parent, path)));
-    return slashed(parent, path);
+bool FileUtils::isAbsolute(const std::string &path) {
+#ifdef _WIN32
+    return path.size() >= 2 && ((path[0] >= 'A' && path[0] <= 'Z') || (path[0] >= 'a' && path[0] <= 'z')) && path[1] == ':';
+#else
+    return !path.empty() && path[0] == '/';
+#endif
 }

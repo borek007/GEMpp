@@ -1,15 +1,16 @@
 #include "Random.h"
+#include <unistd.h>
 
 void Random::seedRand(int seed) {
     if(seed < 0)
-        qsrand(time(NULL) + GETPID() * 1000);
+        srand(time(NULL) + GETPID() * 1000);
     else
-        qsrand(seed);
+        srand(seed);
     rand(); // The first value is not so random...
 }
 
 double Random::randDouble() {
-    return (double)qrand()/(double)RAND_MAX;
+    return (double)rand()/(double)RAND_MAX;
 }
 
 double Random::randDouble(double lower, double upper) {
@@ -17,5 +18,5 @@ double Random::randDouble(double lower, double upper) {
 }
 
 int Random::randInt(int lower, int upper) {
-    return lower + (int) ((upper + 1 - lower)*(qrand()/(RAND_MAX + (double)lower)));
+    return lower + (int) ((upper + 1 - lower)*(rand()/(RAND_MAX + (double)lower)));
 }

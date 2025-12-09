@@ -8,14 +8,14 @@ Identified::Identified(const Identified &other) {
     id_ = other.getID();
 }
 
-Identified::Identified(QString id) : id_(id) {}
+Identified::Identified(const std::string &id) : id_(id) {}
 
 Identified::~Identified() {}
 
-const QString &Identified::getID() const {
+const std::string &Identified::getID() const {
     return id_;
 }
 
-void Identified::setID(QString id) {
+void Identified::setID(const std::string &id) {
     id_ = id;
 }

@@ -4,11 +4,11 @@ Printer::Printer(int indentWidth) : content_(""), indentWidth_(indentWidth), ind
 
 Printer::~Printer() {}
 
-QString Printer::getContent() {
+const std::string &Printer::getContent() const {
     return content_;
 }
 
-void Printer::setContent(const QString &content) {
+void Printer::setContent(const std::string &content) {
     content_ = content;
 }
 
@@ -20,7 +20,7 @@ void Printer::setIndentWidth(int indentWidth) {
     indentWidth_ = indentWidth;
 }
 
-void Printer::dump(QString s) {
+void Printer::dump(const std::string &s) {
     for(int i=0; i<indentLevel_*indentWidth_; ++i) {
         content_ += " ";
     }
@@ -29,7 +29,7 @@ void Printer::dump(QString s) {
 }
 
 void Printer::show() {
-    qcout << content_;
+    std::cout << content_;
 }
 
 void Printer::indent() {
@@ -48,14 +48,41 @@ void Printer::reset() {
     content_.clear();
 }
 
-QString Printer::capitalize(QString s) {
-    QStringList sl = s.split(" ");
-    QStringList slc;
-    for(QString w : sl)
-        slc.append(capitalizeWord(w));
-    return slc.join(" ");
+std::string Printer::capitalize(const std::string &s) {
+    std::string result;
+    std::string word;
+    bool inWord = false;
+
+    for (char c : s) {
+        if (c == ' ' || c == '\t' || c == '\n') {
+            if (inWord) {
+                result += capitalizeWord(word);
+                word.clear();
+                inWord = false;
+            }
+            result += c;
+        } else {
+            word += c;
+            inWord = true;
+        }
+    }
+    if (inWord) {
+        result += capitalizeWord(word);
+    }
+
+    return result;
 }
 
-QString Printer::capitalizeWord(QString w) {
-    return w.left(1).toUpper() + w.mid(1).toLower();
+std::string Printer::capitalizeWord(const std::string &w) {
+    if (w.empty()) return w;
+    std::string result = w;
+    if (result[0] >= 'a' && result[0] <= 'z') {
+        result[0] = result[0] - 'a' + 'A';
+    }
+    for (size_t i = 1; i < result.size(); ++i) {
+        if (result[i] >= 'A' && result[i] <= 'Z') {
+            result[i] = result[i] - 'A' + 'a';
+        }
+    }
+    return result;
 }

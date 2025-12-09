@@ -1,9 +1,9 @@
 #ifndef GEMPP_VARIABLE_H
 #define GEMPP_VARIABLE_H
 
-#include <QHash>
-#include <QPair>
+#include <unordered_map>
 #include <stdexcept>
+#include <utility>
 #include "Core/Identified.h"
 #include "Core/IPrintable.h"
 
@@ -13,18 +13,18 @@ class Variable;
  * @brief The Term type represents the multiplication of a variable by a coefficient as a pair. It is the constituting element of a LinearExpression.
  * @see LinearExpression
  */
-typedef QPair<Variable*, double> Term;
+typedef std::pair<Variable*, double> Term;
 
 /**
  * @brief The ::Quad type represents the multiplication of two variables as a pair.
  */
-typedef QPair<Variable*, Variable *> Quad;
+typedef std::pair<Variable*, Variable *> Quad;
 
 /**
  * @brief The ::QuadTerm type represents the multiplication a ::Quad by a coefficient as a pair. It is the constituting element of a QuadExpression.
  * @see QuadExpression
  */
-typedef QPair<Quad, double> QuadTerm;
+typedef std::pair<Quad, double> QuadTerm;
 
 
 /**
@@ -54,7 +54,7 @@ class DLL_EXPORT Variable : virtual public IPrintable, public Identified {
          * @param lowerBound The integer lower bound of the Variable (0 for a binary)
          * @param upperBound The integer upper bound of the Variable (1 for a binary)
          */
-        Variable(QString id, Type type=BINARY, int lowerBound=0, int upperBound=1);
+        Variable(const std::string &id, Type type=BINARY, int lowerBound=0, int upperBound=1);
 
         /**
          * @brief Destructs a Variable object.
@@ -118,9 +118,9 @@ class DLL_EXPORT Variable : virtual public IPrintable, public Identified {
          * @brief Tests if a Variable is active, i.e. its bounds are not both 0.
          * @return whether the Variable is active
          */
-        void addColumn(QString id, double d);
-        QHash<QString, double> &getColumns();
-        double getColumn(QString id);
+        void addColumn(const std::string &id, double d);
+        std::unordered_map<std::string, double> &getColumns();
+        double getColumn(const std::string &id);
         void setValue(int val);
         int eval();
 
@@ -128,7 +128,7 @@ class DLL_EXPORT Variable : virtual public IPrintable, public Identified {
         operator Term() const;
 
     private:
-        QHash<QString, double> columns_;
+        std::unordered_map<std::string, double> columns_;
         int upperBound_;
         int lowerBound_;
         int value_;

@@ -1,9 +1,9 @@
 #ifndef GEMPP_RANDOM_H
 #define GEMPP_RANDOM_H
 
-#include <QtGlobal>
-#include <QVector>
+#include <cstdlib>
 #include <ctime>
+#include <vector>
 
 #if defined(WIN32) || defined(WIN64) // Windows platform
     #include <io.h>
