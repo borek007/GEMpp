@@ -10,84 +10,30 @@ find_package(PkgConfig REQUIRED)
 # Find Qt5
 find_package(Qt5 REQUIRED COMPONENTS Core Xml Gui Widgets)
 
-# Try to find GLPK
-find_library(GLPK_LIBRARY NAMES glpk)
-find_path(GLPK_INCLUDE_DIR NAMES glpk.h)
+# Use local GLPK and GEM++ libraries
+set(GLPK_LIBRARY "${CMAKE_SOURCE_DIR}/glpk-4.65/w32/glpk_4_65.lib")
+set(GLPK_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/glpk-4.65/src")
 
-# Try to find libgem++
-find_library(GEMPP_LIBRARY NAMES GEM++ libGEM++)
-find_path(GEMPP_INCLUDE_DIR NAMES Model/Graph.h Formulation/SubgraphMatching.h)
+# Use local GEM++ library (link directly to DLL)
+set(GEMPP_LIBRARY "${CMAKE_SOURCE_DIR}/GEM++/GEM++.dll")
+set(GEMPP_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/../src/library")
 
 # Platform-specific settings
 if(WIN32)
-    # Windows-specific paths and libraries
-    if(NOT GLPK_LIBRARY)
-        set(GLPK_LIBRARY "C:/Program Files/GLPK/lib/glpk.lib")
-    endif()
-    if(NOT GLPK_INCLUDE_DIR)
-        set(GLPK_INCLUDE_DIR "C:/Program Files/GLPK/include")
-    endif()
-
-    if(NOT GEMPP_LIBRARY)
-        set(GEMPP_LIBRARY "${CMAKE_SOURCE_DIR}/../src/libGEM++.lib")
-    endif()
-    if(NOT GEMPP_INCLUDE_DIR)
-        set(GEMPP_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/../src/library")
-    endif()
-
     # Additional Windows libraries
     set(EXTRA_LIBS ws2_32)
-
-elseif(APPLE)
-    # macOS-specific paths
-    if(NOT GLPK_LIBRARY)
-        set(GLPK_LIBRARY "/usr/local/lib/libglpk.dylib")
-    endif()
-    if(NOT GLPK_INCLUDE_DIR)
-        set(GLPK_INCLUDE_DIR "/usr/local/include")
-    endif()
-
-    if(NOT GEMPP_LIBRARY)
-        set(GEMPP_LIBRARY "${CMAKE_SOURCE_DIR}/../src/libGEM++.dylib")
-    endif()
-    if(NOT GEMPP_INCLUDE_DIR)
-        set(GEMPP_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/../src/library")
-    endif()
-
-    # Additional macOS libraries
-    set(EXTRA_LIBS "")
-
 else()
-    # Linux/Unix
-    if(NOT GLPK_LIBRARY)
-        set(GLPK_LIBRARY "/usr/lib/libglpk.so")
-    endif()
-    if(NOT GLPK_INCLUDE_DIR)
-        set(GLPK_INCLUDE_DIR "/usr/include")
-    endif()
-
-    if(NOT GEMPP_LIBRARY)
-        set(GEMPP_LIBRARY "${CMAKE_SOURCE_DIR}/../src/libGEM++.so")
-    endif()
-    if(NOT GEMPP_INCLUDE_DIR)
-        set(GEMPP_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/../src/library")
-    endif()
-
-    # Additional Linux libraries
+    # Additional libraries for other platforms
     set(EXTRA_LIBS "")
 endif()
 
-# Check if libraries were found
-if(NOT GLPK_LIBRARY)
-    message(WARNING "GLPK library not found automatically. Please install GLPK or set GLPK_LIBRARY manually.")
-    message("On macOS: brew install glpk")
-    message("On Ubuntu: sudo apt-get install libglpk-dev")
-    message("On Windows: Download from https://sourceforge.net/projects/winglpk/")
+# Check if local libraries exist
+if(NOT EXISTS "${GLPK_LIBRARY}")
+    message(FATAL_ERROR "GLPK library not found at ${GLPK_LIBRARY}. Please ensure GLPK is built in glpk-4.65/w32/")
 endif()
 
-if(NOT GEMPP_LIBRARY)
-    message(WARNING "libGEM++ library not found. Please build libGEM++ first from the main project.")
-    message("Run 'qmake GEM++.pro && make' in the root directory first.")
+if(NOT EXISTS "${GEMPP_LIBRARY}")
+    message(FATAL_ERROR "GEM++ library not found at ${GEMPP_LIBRARY}. Please ensure GEM++ is available in GEM++/ directory.")
 endif()
 
 # Include directories
@@ -122,6 +68,30 @@ if(MSVC)
     target_compile_options(gempp-sub PRIVATE /W4)
 else()
     target_compile_options(gempp-sub PRIVATE -Wall -Wextra -pedantic)
+endif()
+
+# Copy required DLLs to output directory
+if(WIN32)
+    add_custom_command(TARGET gempp-sub POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/glpk-4.65/w32/glpk_4_65.dll"
+            $<TARGET_FILE_DIR:gempp-sub>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/GEM++/GEM++.dll"
+            $<TARGET_FILE_DIR:gempp-sub>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/GEM++/Qt5Core.dll"
+            $<TARGET_FILE_DIR:gempp-sub>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/GEM++/Qt5Xml.dll"
+            $<TARGET_FILE_DIR:gempp-sub>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/GEM++/Qt5Gui.dll"
+            $<TARGET_FILE_DIR:gempp-sub>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/GEM++/Qt5Widgets.dll"
+            $<TARGET_FILE_DIR:gempp-sub>
+    )
 endif()
 
 # Install target
