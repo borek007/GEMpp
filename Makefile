@@ -46,7 +46,7 @@ EXE_EXT      :=
 endif
 
 # GLPK vendoring (download + static build)
-GLPK_VERSION ?= 5.0
+GLPK_VERSION ?= 4.65
 GLPK_URL     := https://ftp.gnu.org/gnu/glpk/glpk-$(GLPK_VERSION).tar.gz
 GLPK_SRC_DIR := third_party/glpk/src
 GLPK_BUILD   := third_party/glpk/build
